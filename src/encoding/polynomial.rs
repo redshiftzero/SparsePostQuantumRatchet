@@ -64,10 +64,14 @@ impl PartialEq for Pt {
 }
 
 // The highest degree polynomial that will be stored for Protocol V1
+// Used in hax_lib annotations
+#[allow(dead_code)]
 pub const MAX_STORED_POLYNOMIAL_DEGREE_V1: usize = 35;
 
 // The highest degree polynomial that will be constructed in intermediate
 // calculations for Protocol V1
+// Used in hax_lib annotations
+#[allow(dead_code)]
 pub const MAX_INTERMEDIATE_POLYNOMIAL_DEGREE_V1: usize = 36;
 
 #[derive(Clone, PartialEq)]
@@ -523,7 +527,7 @@ impl PolyEncoder {
         EncoderState::Polys(polys) => hax_lib::Prop::from(polys.len() == 16).and(hax_lib::prop::forall(|poly: &Poly|
             hax_lib::prop::implies(polys.contains(poly), poly.coefficients.len() <= MAX_INTERMEDIATE_POLYNOMIAL_DEGREE_V1)))
     })]
-    pub fn into_pb(self) -> proto::pq_ratchet::PolynomialEncoder {
+    pub(crate) fn into_pb(self) -> proto::pq_ratchet::PolynomialEncoder {
         let mut out = proto::pq_ratchet::PolynomialEncoder {
             idx: self.idx,
             pts: Vec::with_capacity(16),
@@ -555,7 +559,7 @@ impl PolyEncoder {
         out
     }
 
-    pub fn from_pb(pb: proto::pq_ratchet::PolynomialEncoder) -> Result<Self, PolynomialError> {
+    pub(crate) fn from_pb(pb: proto::pq_ratchet::PolynomialEncoder) -> Result<Self, PolynomialError> {
         let s = if !pb.pts.is_empty() {
             if !pb.polys.is_empty() {
                 return Err(PolynomialError::SerializationInvalid);
@@ -679,6 +683,20 @@ impl PolyEncoder {
             data: (&out[..]).try_into().expect("should be exactly 32 bytes"),
         }
     }
+
+    /// Public wrapper for test utilities and benchmarks.
+    /// For internal use, call `into_pb` directly.
+    #[cfg(feature = "test-utils")]
+    pub fn into_pb_test(self) -> proto::pq_ratchet::PolynomialEncoder {
+        self.into_pb()
+    }
+
+    /// Public wrapper for test utilities and benchmarks.
+    /// For internal use, call `from_pb` directly.
+    #[cfg(feature = "test-utils")]
+    pub fn from_pb_test(pb: proto::pq_ratchet::PolynomialEncoder) -> Result<Self, PolynomialError> {
+        Self::from_pb(pb)
+    }
 }
 
 #[hax_lib::attributes]
@@ -724,6 +742,8 @@ pub struct PolyDecoder {
 
 #[hax_lib::attributes]
 impl PolyDecoder {
+    // Used in hax_lib annotations
+    #[allow(dead_code)]
     pub fn get_pts_needed(&self) -> usize {
         self.pts_needed
     }
@@ -749,7 +769,7 @@ impl PolyDecoder {
         })
     }
 
-    pub fn into_pb(self) -> proto::pq_ratchet::PolynomialDecoder {
+    pub(crate) fn into_pb(self) -> proto::pq_ratchet::PolynomialDecoder {
         let mut out = proto::pq_ratchet::PolynomialDecoder {
             pts_needed: self.pts_needed as u32,
             polys: 16,
@@ -769,7 +789,7 @@ impl PolyDecoder {
         out
     }
 
-    pub fn from_pb(pb: proto::pq_ratchet::PolynomialDecoder) -> Result<Self, PolynomialError> {
+    pub(crate) fn from_pb(pb: proto::pq_ratchet::PolynomialDecoder) -> Result<Self, PolynomialError> {
         if pb.pts.len() != 16 {
             return Err(PolynomialError::SerializationInvalid);
         }
@@ -790,6 +810,20 @@ impl PolyDecoder {
             out.pts[i] = v;
         }
         Ok(out)
+    }
+
+    /// Public wrapper for test utilities and benchmarks.
+    /// For internal use, call `into_pb` directly.
+    #[cfg(feature = "test-utils")]
+    pub fn into_pb_test(self) -> proto::pq_ratchet::PolynomialDecoder {
+        self.into_pb()
+    }
+
+    /// Public wrapper for test utilities and benchmarks.
+    /// For internal use, call `from_pb` directly.
+    #[cfg(feature = "test-utils")]
+    pub fn from_pb_test(pb: proto::pq_ratchet::PolynomialDecoder) -> Result<Self, PolynomialError> {
+        Self::from_pb(pb)
     }
 }
 

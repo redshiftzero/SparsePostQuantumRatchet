@@ -1,21 +1,36 @@
 // Copyright 2025 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 
-pub mod authenticator;
+pub(crate) mod authenticator;
+#[cfg(feature = "test-utils")]
 pub mod chain;
+#[cfg(not(feature = "test-utils"))]
+pub(crate) mod chain;
+#[cfg(feature = "test-utils")]
 pub mod encoding;
+#[cfg(not(feature = "test-utils"))]
+pub(crate) mod encoding;
 pub(crate) mod incremental_mlkem768;
 pub(crate) mod kdf;
-pub mod proto;
-pub mod serialize;
+pub(crate) mod serialize;
 pub(crate) mod test;
 pub(crate) mod util;
 mod v1;
+
+#[cfg(feature = "test-utils")]
+pub mod proto;
+#[cfg(not(feature = "test-utils"))]
+mod proto;
 
 use crate::chain::Chain;
 pub use crate::chain::ChainParams;
 use crate::proto::pq_ratchet as pqrpb;
 pub use crate::proto::pq_ratchet::{Direction, Version};
+// Re-export error types that are part of the public Error enum
+pub use crate::authenticator::Error as AuthenticatorError;
+pub use crate::encoding::polynomial::PolynomialError;
+pub use crate::encoding::EncodingError;
+pub use crate::serialize::Error as SerializationError;
 use prost::Message;
 use rand::{CryptoRng, Rng};
 use std::cmp::Ordering;

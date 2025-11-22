@@ -541,10 +541,6 @@ impl GF16 {
         Self { value }
     }
 
-    pub fn inv(&self) -> GF16 {
-        GF16::ONE.div_impl(self)
-    }
-
     fn div_impl(&self, other: &Self) -> Self {
         // Within GF(p^n), inv(a) == a^(p^n-2).  We're GF(2^16) == GF(65536),
         // so we can compute GF(65534).
@@ -563,12 +559,6 @@ impl GF16 {
     }
 
     pub const fn const_sub(&self, other: &Self) -> Self {
-        Self {
-            value: self.value ^ other.value,
-        }
-    }
-
-    pub const fn const_add(&self, other: &Self) -> Self {
         Self {
             value: self.value ^ other.value,
         }
@@ -593,9 +583,6 @@ impl GF16 {
         out
     }
 
-    pub const fn const_inv(&self) -> GF16 {
-        GF16::ONE.const_div(self)
-    }
 }
 
 #[cfg(test)]
@@ -632,17 +619,7 @@ mod test {
             assert_eq!(a, b);
         }
     }
-    #[test]
-    fn inv() {
-        let mut rng = rand::rng();
-        for _i in 0..100 {
-            let x = rng.next_u32() as u16;
-            assert_eq!(
-                (GF16 { value: x } * GF16 { value: x }.inv()).value,
-                GF16::ONE.value
-            );
-        }
-    }
+    
     #[test]
     fn div() {
         let mut rng = rand::rng();

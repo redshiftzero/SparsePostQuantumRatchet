@@ -37,7 +37,7 @@ const DEFAULT_CHAIN_PARAMS: ChainParams = ChainParams {
 };
 
 impl ChainParams {
-    pub fn into_pb(self) -> ChainParamsPB {
+    pub(crate) fn into_pb(self) -> ChainParamsPB {
         ChainParamsPB {
             max_jump: if self.max_jump == DEFAULT_CHAIN_PARAMS.max_jump {
                 0
@@ -50,6 +50,13 @@ impl ChainParams {
                 self.max_ooo_keys
             },
         }
+    }
+
+    /// Public wrapper for test utilities and benchmarks.
+    /// For internal use, call `into_pb` directly.
+    #[cfg(feature = "test-utils")]
+    pub fn into_pb_test(self) -> ChainParamsPB {
+        self.into_pb()
     }
 }
 
@@ -392,7 +399,7 @@ impl Chain {
     }
 
     #[hax_lib::opaque] // into_iter and map
-    pub fn into_pb(self) -> pqrpb::Chain {
+    pub(crate) fn into_pb(self) -> pqrpb::Chain {
         pqrpb::Chain {
             direction: self.dir.into(),
             current_epoch: self.current_epoch,
@@ -411,7 +418,7 @@ impl Chain {
     }
 
     #[hax_lib::opaque] // into_iter and map
-    pub fn from_pb(pb: pqrpb::Chain) -> Result<Self, Error> {
+    pub(crate) fn from_pb(pb: pqrpb::Chain) -> Result<Self, Error> {
         Ok(Self {
             dir: pb.direction.try_into().map_err(|_| Error::StateDecode)?,
             current_epoch: pb.current_epoch,

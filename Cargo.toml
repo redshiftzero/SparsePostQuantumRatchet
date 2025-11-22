@@ -17,7 +17,7 @@ libcrux-hmac = "0.0.3"
 libcrux-ml-kem = { version = "0.0.3", default-features = false, features = ["incremental", "mlkem768"] }
 log = "0.4.21"
 num_enum = "0.7.3"
-prost = "0.13.1"
+prost = "0.14.1"
 rand = "0.9"
 rand_core = "0.9"
 sha2 = "0.10"
@@ -25,6 +25,9 @@ sorted-vec = "0.8.6"
 thiserror = "2.0.11"
 
 [dev-dependencies]
+# When built directly, auto-enable the test-utils feature.
+spqr = { path = ".", features = ["test-utils"] }
+
 galois_field_2pm = "0.1.0"
 hmac = "0.12.1"
 matches = "0.1.10"
@@ -32,10 +35,11 @@ rand_08 = { package = "rand", version = "0.8" }
 rand_distr = "0.5.1"
 
 [build-dependencies]
-prost-build = "0.13.1"
+prost-build = "0.14.1"
 
 [features]
 proof = []
+test-utils = []
 
 [target.'cfg(not(any(windows, target_arch = "x86")))'.dependencies]
 # sha2's asm implementation uses standalone .S files that aren't compiled correctly on Windows,

@@ -5,8 +5,6 @@ pub mod gf;
 pub mod polynomial;
 pub mod round_robin;
 
-use crate::proto::pq_ratchet as pqrpb;
-
 #[derive(Debug, thiserror::Error, Copy, Clone, PartialEq)]
 pub enum EncodingError {
     #[error("Polynomial error: {0}")]
@@ -29,28 +27,6 @@ pub struct Chunk {
     pub data: [u8; 32],
 }
 
-impl Chunk {
-    pub fn into_pb(self) -> pqrpb::Chunk {
-        pqrpb::Chunk {
-            index: self.index as u32,
-            data: self.data[..].to_vec(),
-        }
-    }
-
-    pub fn from_pb(pb: pqrpb::Chunk) -> Result<Self, EncodingError> {
-        Ok(Self {
-            index: pb
-                .index
-                .try_into()
-                .map_err(|_| EncodingError::ChunkIndexDecodingError)?,
-            data: pb
-                .data
-                .as_slice()
-                .try_into()
-                .map_err(|_| EncodingError::ChunkDataDecodingError)?,
-        })
-    }
-}
 
 #[hax_lib::attributes]
 pub trait Encoder {

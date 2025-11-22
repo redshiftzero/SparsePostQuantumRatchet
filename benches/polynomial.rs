@@ -66,9 +66,9 @@ mod tests {
     #[bench]
     fn encoder_from_pb(b: &mut Bencher) {
         let encoder = PolyEncoder::encode_bytes(&[3u8; 1088]).expect("encode_bytes");
-        let bytes = encoder.into_pb().encode_to_vec();
+        let bytes = encoder.into_pb_test().encode_to_vec();
         b.iter(|| {
-            black_box(PolyEncoder::from_pb(
+            black_box(PolyEncoder::from_pb_test(
                 pqrpb::PolynomialEncoder::decode(bytes.as_slice()).unwrap(),
             ))
         });
@@ -82,9 +82,9 @@ mod tests {
         for i in 1..chunks_needed {
             decoder.add_chunk(&encoder.chunk_at(i));
         }
-        let bytes = decoder.into_pb().encode_to_vec();
+        let bytes = decoder.into_pb_test().encode_to_vec();
         b.iter(|| {
-            black_box(PolyDecoder::from_pb(
+            black_box(PolyDecoder::from_pb_test(
                 pqrpb::PolynomialDecoder::decode(bytes.as_slice()).unwrap(),
             ))
         });
