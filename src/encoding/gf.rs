@@ -582,7 +582,6 @@ impl GF16 {
         }
         out
     }
-
 }
 
 #[cfg(test)]
@@ -619,7 +618,7 @@ mod test {
             assert_eq!(a, b);
         }
     }
-    
+
     #[test]
     fn div() {
         let mut rng = rand::rng();

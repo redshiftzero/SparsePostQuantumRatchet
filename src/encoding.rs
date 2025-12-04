@@ -27,7 +27,6 @@ pub struct Chunk {
     pub data: [u8; 32],
 }
 
-
 #[hax_lib::attributes]
 pub trait Encoder {
     #[hax_lib::requires(true)]
@@ -35,7 +34,6 @@ pub trait Encoder {
     where
         Self: Sized;
     fn next_chunk(&mut self) -> Chunk;
-    fn data(&self) -> &Vec<u8>;
 }
 
 #[hax_lib::attributes]
@@ -46,8 +44,6 @@ pub trait Decoder {
         Self: Sized;
     fn add_chunk(&mut self, chunk: &Chunk);
     fn decoded_message(&self) -> Option<Vec<u8>>;
-    //fn take_decoded_message(&mut self) -> Option<Vec<u8>>;
-    fn is_complete(&self) -> bool;
 }
 
 // XXX: For ease of formal verification with hax, we avoid using
@@ -72,15 +68,6 @@ impl<T: Encoder> Encoder for Option<T> {
         let chunk = T::next_chunk(&mut tmp);
         *self = Some(tmp);
         chunk
-    }
-
-    #[hax_lib::requires(self.is_some())]
-    fn data(&self) -> &Vec<u8> {
-        let value = self.as_ref().unwrap();
-        hax_lib::fstar!(
-            "Hax_lib.v_assume (f_data_pre #v_T #FStar.Tactics.Typeclasses.solve value)"
-        );
-        T::data(value)
     }
 }
 
@@ -110,21 +97,5 @@ impl<T: Decoder> Decoder for Option<T> {
             "Hax_lib.v_assume (f_decoded_message_pre #v_T #FStar.Tactics.Typeclasses.solve value)"
         );
         T::decoded_message(value)
-    }
-
-    /* fn take_decoded_message(&mut self) -> Option<Vec<u8>> {
-        let mut tmp = self.take().unwrap();
-        let result = T::take_decoded_message(&mut tmp);
-        *self = Some(tmp);
-        result
-    } */
-
-    #[hax_lib::requires(self.is_some())]
-    fn is_complete(&self) -> bool {
-        let value = self.as_ref().unwrap();
-        hax_lib::fstar!(
-            "Hax_lib.v_assume (f_is_complete_pre #v_T #FStar.Tactics.Typeclasses.solve value)"
-        );
-        T::is_complete(value)
     }
 }

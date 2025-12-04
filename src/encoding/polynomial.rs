@@ -559,7 +559,9 @@ impl PolyEncoder {
         out
     }
 
-    pub(crate) fn from_pb(pb: proto::pq_ratchet::PolynomialEncoder) -> Result<Self, PolynomialError> {
+    pub(crate) fn from_pb(
+        pb: proto::pq_ratchet::PolynomialEncoder,
+    ) -> Result<Self, PolynomialError> {
         let s = if !pb.pts.is_empty() {
             if !pb.polys.is_empty() {
                 return Err(PolynomialError::SerializationInvalid);
@@ -711,11 +713,6 @@ impl Encoder for PolyEncoder {
         self.idx = self.idx.wrapping_add(1);
         out
     }
-
-    #[hax_lib::requires(false)]
-    fn data(&self) -> &Vec<u8> {
-        todo!()
-    }
 }
 
 #[derive(Clone)]
@@ -789,7 +786,9 @@ impl PolyDecoder {
         out
     }
 
-    pub(crate) fn from_pb(pb: proto::pq_ratchet::PolynomialDecoder) -> Result<Self, PolynomialError> {
+    pub(crate) fn from_pb(
+        pb: proto::pq_ratchet::PolynomialDecoder,
+    ) -> Result<Self, PolynomialError> {
         if pb.pts.len() != 16 {
             return Err(PolynomialError::SerializationInvalid);
         }
@@ -905,10 +904,6 @@ impl Decoder for PolyDecoder {
             out.push(y.value as u8);
         }
         Some(out)
-    }
-
-    fn is_complete(&self) -> bool {
-        self.is_complete
     }
 }
 

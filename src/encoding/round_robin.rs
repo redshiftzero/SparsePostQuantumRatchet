@@ -39,10 +39,6 @@ impl Encoder for RoundRobinEncoder {
         self.next_idx += 1;
         self.chunk_at(index)
     }
-
-    fn data(&self) -> &Vec<u8> {
-        &self.data
-    }
 }
 
 type ChunkData = [u8; 32];
@@ -91,17 +87,5 @@ impl Decoder for RoundRobinDecoder {
         } else {
             None
         }
-    }
-
-    /* fn take_decoded_message(&mut self) -> Option<Vec<u8>> {
-        let data = self.decoded_message();
-        if data.is_some() {
-            self.is_complete = true;
-        }
-        data
-    } */
-
-    fn is_complete(&self) -> bool {
-        self.is_complete
     }
 }
